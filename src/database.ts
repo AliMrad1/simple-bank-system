@@ -147,11 +147,12 @@ export class Database{
         }
     }
     
-    async TRANSFER_MONEY_BETWEEN_TWO_ACCOUNTS (transaction_body:any)  {
+    async TRANSFER_MONEY_BETWEEN_TWO_ACCOUNTS (amount:number,amountConverted:number, from_id:number, to_id:number )  {
         const TRANSFER_MONEY = `EXEC [DBO].[TRANSFER_FOM_ACCOUNT1_TO_ACCOUNT2]
-                                    ${transaction_body.from},
-                                    ${transaction_body.to},
-                                    ${transaction_body.amount}
+                                    ${from_id},
+                                    ${to_id},
+                                    ${amountConverted},
+                                    ${amount}
                                     ;
                                 `
         try {
