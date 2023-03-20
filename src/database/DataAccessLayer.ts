@@ -1,10 +1,11 @@
 import * as sql from "mssql";
 import * as msnodesqlv8 from 'mssql/msnodesqlv8';
-import { Account } from "./Account";
+import { BankRepository } from "../entities/BankRepository";
+import { Account } from "../entities/Account";
 
 const CONN_STR='Server=127.0.0.1,1433;Database=BANK;User Id=sa;Password=123456@@;Encrypt=false'
 
-export class Database{
+export class DataAccessLayer implements BankRepository {
     
     connection: sql.ConnectionPool = new sql.ConnectionPool(CONN_STR, (err) => {
         if (err) {
@@ -12,14 +13,14 @@ export class Database{
         }
     });
 
-    async connectToDatabase() {
+    private async connectToDatabase() {
        
         await this.connection.connect().then(() => { 
             console.log("connecting...")
         });
     }
 
-    closeConnectionToDatabase(){
+    private closeConnectionToDatabase(){
         this.connection.close().then(() => {
             console.log("close connection...")
         });
@@ -54,10 +55,7 @@ export class Database{
     }
     
     async getSingleACCOUNTFromDB(id: string) {
-        const _GET_QUERY = `SELECT *
-                            FROM
-                            [TBL_ACCOUNTS]
-                            WHERE [ID] = ${id};`
+        const _GET_QUERY = `EXEC [DBO].[GET_ACCOUNT_BY_ID] ${id};`
         try {
             await this.connectToDatabase();
             const result = await this.connection.query(_GET_QUERY).then();
@@ -104,21 +102,21 @@ export class Database{
         }
     }
     
-    async DE_ACTIVATE_ACCOUNTFromDB(id: string) {    
+    async DE_ACTIVATE_ACCOUNTFromDB(id: string):Promise<string> {    
         const _DISABLE_QUERY = `EXEC DBO.DI_ACTIVATED_ACC ${id}`;
         try {
             await this.connectToDatabase()
             const result = await this.connection.query(_DISABLE_QUERY).then();
             return `the account + ${id} + has been disactivated`                  
         } catch (err) {
-            console.log(err);
+            return err;
         }
         finally{   
             this.closeConnectionToDatabase();
         }
     }
     
-    async ACTIVATE_ACCOUNTFromDB(id: string) {    
+    async ACTIVATE_ACCOUNTFromDB(id: string):Promise<string> {    
         const _DISABLE_QUERY = `EXEC DBO.ACTIVATE_ACC ${id}`;
         try {
             await this.connectToDatabase()

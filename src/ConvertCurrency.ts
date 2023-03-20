@@ -1,6 +1,6 @@
-import { Account } from "./Account";
+import { Account } from "./entities/Account";
 
-export class ConvertCurrency{
+class ConvertCurrency{
 
     convert(amount: number,account1:Account, account2:Account):number {
         //check
@@ -57,3 +57,5 @@ export class ConvertCurrency{
     }
 
 }
+
+export default ConvertCurrency;
